@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#10B981">
+    <meta name="description" content="Ikimera - AI-powered crop disease diagnosis for farmers">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- iOS Safari specific meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Ikimera">
+    
+    <title>Ikimera - Smart Farming Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Auth Screen -->
+        <div id="auth-screen" class="auth-container">
+            <div class="auth-header">
+                <h1>🌾 Ikimera</h1>
+                <p>Smart Farming Assistant</p>
+            </div>
+
+            <div class="auth-card">
+                <div class="auth-toggle">
+                    <button id="login-toggle" class="toggle-btn active">
+                        <span class="icon">📝</span>
+                        Login
+                    </button>
+                    <button id="signup-toggle" class="toggle-btn">
+                        <span class="icon">👤</span>
+                        Sign Up
+                    </button>
+                </div>
+
+                <form id="auth-form" class="auth-form">
+                    <div id="name-group" class="form-group" style="display: none;">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="name" class="form-input" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+                    </div>
+
+                    <div id="phone-group" class="form-group" style="display: none;">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="password" class="form-input password-input" placeholder="Enter your password" required minlength="6">
+                            <button type="button" id="password-toggle" class="password-toggle">
+                                <span class="icon">👁️</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="error-message" class="error-message" style="display: none;"></div>
+
+                    <button type="submit" id="auth-submit" class="btn btn-primary">
+                        <span class="icon">📝</span>
+                        Login
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p>
+                        <span id="auth-switch-text">Don't have an account? </span>
+                        <button id="auth-switch" class="link-btn">Sign Up</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="main-app" class="app-container" style="display: none;">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="header-title">
+                        <h1>🌾 Ikimera</h1>
+                        <p>Smart Farming Assistant</p>
+                    </div>
+                    <div class="user-info">
+                        <span id="user-name">Hello, User</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main id="main-content" class="main-content">
+                <!-- Diagnose Tab -->
+                <div id="diagnose-tab" class="tab-content active">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <span class="icon">📷</span>
+                            <h2>Crop Diagnosis</h2>
+                        </div>
+
+                        <div id="upload-area" class="image-upload-area">
+                            <span class="icon" style="font-size: 48px; margin-bottom: 16px;">📤</span>
+                            <h3>Upload Crop Image</h3>
+                            <p>Drag and drop or click to select an image of your crop leaf</p>
+                            <input type="file" id="crop-image" accept="image/*" style="display: none;">
+                        </div>
+
+                        <div id="image-form" style="display: none;">
+                            <img id="preview-image" class="uploaded-image" style="display: none;">
+                            
+                            <div class="form-group">
+                                <label class="form-label">Crop Type</label>
+                                <input type="text" id="crop-type" class="form-input" placeholder="e.g., Tomato, Maize, Bean">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Additional Notes</label>
+                                <textarea id="crop-notes" class="form-textarea" placeholder="Describe any symptoms or concerns you've noticed..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="button" id="get-location" class="btn btn-secondary">
+                                    <span class="icon">📍</span>
+                                    Get Current Location
+                                </button>
+                                <p id="location-display" style="font-size: 0.875rem; color: var(--neutral-600); margin-top: 8px; display: none;"></p>
+                            </div>
+
+                            <div style="display: flex; gap: 12px;">
+                                <button id="analyze-crop" class="btn btn-primary" style="flex: 1;">
+                                    <span class="icon">📷</span>
+                                    Analyze Crop
+                                </button>
+                                <button id="reset-form" class="btn btn-secondary">Reset</button>
+                            </div>
+                        </div>
+
+                        <div id="diagnosis-result" style="display: none;">
+                            <img id="result-image" class="uploaded-image">
+                            <div id="diagnosis-badge" class="status-badge">
+                                <strong id="disease-name"></strong>
+                                <span id="confidence-level"></span>
+                            </div>
+                            <div id="recommendations" style="margin-top: 16px; display: none;">
+                                <h4>Recommendations:</h4>
+                                <ul id="recommendations-list" style="margin-top: 8px; padding-left: 20px;"></ul>
+                            </div>
+                            <button id="diagnose-another" class="btn btn-primary" style="margin-top: 16px;">
+                                <span class="icon">📷</span>
+                                Diagnose Another
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div id="history-tab" class="tab-content">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <span class="icon">📋</span>
+                            <h2>Diagnosis History</h2>
+                        </div>
+                        <div id="history-content">
+                            <div id="history-loading" class="loading">
+                                <div class="spinner"></div>
+                            </div>
+                            <div id="history-empty" style="display: none; text-align: center; padding: 40px; color: var(--neutral-500);">
+                                <span class="icon" style="font-size: 48px; margin-bottom: 16px;">📋</span>
+                                <h3>No diagnoses yet</h3>
+                                <p>Upload your first crop image to get started!</p>
+                            </div>
+                            <div id="history-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Tab -->
+                <div id="weather-tab" class="tab-content">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <span class="icon">☁️</span>
+                            <h2>Weather Forecast</h2>
+                        </div>
+                        <div id="weather-content">
+                            <div id="weather-loading" class="loading">
+                                <div class="spinner"></div>
+                                <p>Getting weather information...</p>
+                            </div>
+                            <div id="weather-error" style="display: none; text-align: center; padding: 40px; color: var(--error);">
+                                <span class="icon" style="font-size: 48px; margin-bottom: 16px;">☁️</span>
+                                <h3>Weather Unavailable</h3>
+                                <p id="weather-error-message"></p>
+                                <button id="weather-retry" class="btn btn-primary" style="margin-top: 16px;">Try Again</button>
+                            </div>
+                            <div id="weather-data" style="display: none;">
+                                <p id="weather-location" style="color: var(--neutral-600); margin-bottom: 20px; text-align: center;"></p>
+                                <div class="weather-cards">
+                                    <div class="weather-card">
+                                        <div id="current-icon" style="margin-bottom: 12px; font-size: 32px;"></div>
+                                        <div id="current-temp" class="weather-temp"></div>
+                                        <div id="current-condition" class="weather-condition"></div>
+                                        <div style="font-size: 0.875rem; margin-top: 8px; opacity: 0.8;">Today</div>
+                                    </div>
+                                    <div class="weather-card" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);">
+                                        <div id="tomorrow-icon" style="margin-bottom: 12px; font-size: 32px;"></div>
+                                        <div id="tomorrow-temp" class="weather-temp"></div>
+                                        <div id="tomorrow-condition" class="weather-condition"></div>
+                                        <div style="font-size: 0.875rem; margin-top: 8px; opacity: 0.8;">Tomorrow</div>
+                                    </div>
+                                </div>
+                                <div class="card" style="background: var(--neutral-50); margin-top: 16px;">
+                                    <h3 style="margin-bottom: 16px; color: var(--neutral-700);">Details</h3>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span class="icon" style="color: var(--primary);">💧</span>
+                                            <div>
+                                                <div style="font-size: 0.875rem; color: var(--neutral-600);">Humidity</div>
+                                                <div id="current-humidity" style="font-weight: 600;"></div>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span class="icon" style="color: var(--primary);">💨</span>
+                                            <div>
+                                                <div style="font-size: 0.875rem; color: var(--neutral-600);">Wind Speed</div>
+                                                <div id="current-wind" style="font-weight: 600;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="farming-tips" style="margin-top: 16px; padding: 12px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                                        <h4 style="color: var(--primary); margin-bottom: 8px;">Farming Tips</h4>
+                                        <ul id="tips-list" style="font-size: 0.875rem; color: var(--neutral-700); padding-left: 16px;"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Tab -->
+                <div id="profile-tab" class="tab-content">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <span class="icon">👤</span>
+                            <h2>Profile</h2>
+                        </div>
+
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <div id="profile-avatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: white; font-size: 2rem; font-weight: bold;"></div>
+                            <h3 id="profile-name"></h3>
+                            <p id="profile-role" style="color: var(--neutral-600); text-transform: capitalize;"></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="icon">📧</span>
+                                Email
+                            </label>
+                            <p id="profile-email"></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span class="icon">📱</span>
+                                Phone
+                            </label>
+                            <p id="profile-phone"></p>
+                        </div>
+
+                        <div style="margin-top: 32px;">
+                            <button id="logout-btn" class="btn btn-danger" style="width: 100%;">
+                                <span class="icon">🚪</span>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="margin-bottom: 16px; color: var(--neutral-700);">About Ikimera</h3>
+                        <p style="font-size: 0.875rem; color: var(--neutral-600); line-height: 1.6;">
+                            Ikimera is a smart farming assistant that helps farmers diagnose crop diseases using AI technology. 
+                            Upload photos of your crops to get instant analysis and recommendations for better farming practices.
+                        </p>
+                        
+                        <div style="margin-top: 16px; padding: 12px; background: var(--neutral-50); border-radius: 8px;">
+                            <h4 style="color: var(--primary); margin-bottom: 8px;">Features</h4>
+                            <ul style="font-size: 0.875rem; color: var(--neutral-700); padding-left: 16px;">
+                                <li>AI-powered crop disease diagnosis</li>
+                                <li>Weather forecasting for farming</li>
+                                <li>History tracking of all diagnoses</li>
+                                <li>Offline support for rural areas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Bottom Navigation -->
+            <nav class="bottom-nav">
+                <button class="nav-item active" data-tab="diagnose">
+                    <span class="icon">📷</span>
+                    <span>Diagnose</span>
+                </button>
+                <button class="nav-item" data-tab="history">
+                    <span class="icon">📋</span>
+                    <span>History</span>
+                </button>
+                <button class="nav-item" data-tab="weather">
+                    <span class="icon">☁️</span>
+                    <span>Weather</span>
+                </button>
+                <button class="nav-item" data-tab="profile">
+                    <span class="icon">👤</span>
+                    <span>Profile</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
